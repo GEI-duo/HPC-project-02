@@ -80,6 +80,24 @@ void solve_heat_equation(double *grid, double *new_grid, int steps, double r, in
             }
         }
 
+        // Set Dirichlet boundaries on top and bottom rows
+        if (is_first)
+        {
+            #pragma omp parallel for
+            for (j = 0; j < ny; j++)
+            {
+                new_grid[1 * ny + j] = 0.0;  // First interior row, boundary above
+            }
+        }
+        if (is_last)
+        {
+            #pragma omp parallel for
+            for (j = 0; j < ny; j++)
+            {
+                new_grid[local_nx * ny + j] = 0.0;  // Last interior row, boundary below
+            }
+        }
+
         temp = grid;
         grid = new_grid;
         new_grid = temp;
