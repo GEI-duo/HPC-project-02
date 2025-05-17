@@ -20,37 +20,37 @@ void initialize_grid(double *grid, int nx, int ny, int rank, int size, int local
     int extra = nx % size;
     int row_offset = rank * base_rows + (rank < extra ? rank : extra);
     int i, j, global_i;
+    double value;
 
-#pragma omp parallel for private(i, j, global_i)
+#pragma omp parallel for collapse(2) private(i, j, global_i, value)
     for (i = 1; i <= local_nx; i++)
     {
-        global_i = row_offset + i - 1;
         for (j = 0; j < ny; j++)
         {
-            // Skip global boundary rows and columns
-            if (global_i == 0 || global_i == nx - 1 || j == 0 || j == ny - 1)
+            global_i = row_offset + i - 1;
+            value = 0.0;
+
+            if (global_i != 0 && global_i != nx - 1 && j != 0 && j != ny - 1)
             {
-                grid[i * ny + j] = 0.0;
+                if (global_i == j || global_i == nx - 1 - j)
+                {
+                    value = T;
+                }
             }
-            else if (global_i == j || global_i == nx - 1 - j)
-            {
-                grid[i * ny + j] = T; // Diagonal heat sources (excluding border)
-            }
-            else
-            {
-                grid[i * ny + j] = 0.0;
-            }
+
+            grid[i * ny + j] = value;
         }
     }
 }
+
 
 void solve_heat_equation(double *grid, double *new_grid, int steps, double r, int ny, int local_nx, int rank, int size)
 {
     double *temp;
     int i, j, step, global_i;
-
     int is_first = (rank == 0);
     int is_last = (rank == size - 1);
+    int idx;
 
     for (step = 1; step < steps; step++)
     {
@@ -58,22 +58,25 @@ void solve_heat_equation(double *grid, double *new_grid, int steps, double r, in
         if (!is_first)
         {
             MPI_Sendrecv(&grid[1 * ny], ny, MPI_DOUBLE, rank - 1, 0,
-                         &grid[0 * ny], ny, MPI_DOUBLE, rank - 1, 0,
+                         &grid[0 * ny], ny, MPI_DOUBLE, rank - 1, 1,
                          MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
         if (!is_last)
         {
-            MPI_Sendrecv(&grid[local_nx * ny], ny, MPI_DOUBLE, rank + 1, 0,
+            MPI_Sendrecv(&grid[local_nx * ny], ny, MPI_DOUBLE, rank + 1, 1,
                          &grid[(local_nx + 1) * ny], ny, MPI_DOUBLE, rank + 1, 0,
                          MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
 #pragma omp parallel for private(i, j) collapse(2)
-        for (i = is_first ? 2 : 1; i <= local_nx - (is_last ? 1 : 0); i++)
+        for (i = 1; i <= local_nx; i++)
         {
             for (j = 1; j < ny - 1; j++)
             {
-                new_grid[i * ny + j] = grid[i * ny + j] + r * (grid[(i + 1) * ny + j] + grid[(i - 1) * ny + j] - 2 * grid[i * ny + j]) + r * (grid[i * ny + j + 1] + grid[i * ny + j - 1] - 2 * grid[i * ny + j]);
+                idx = i * ny + j;
+                new_grid[idx] = grid[idx]
+                                + r * (grid[idx + ny] + grid[idx - ny] - 2 * grid[idx])
+                                + r * (grid[idx + 1] + grid[idx - 1] - 2 * grid[idx]);
             }
         }
 
@@ -233,8 +236,8 @@ int main(int argc, char *argv[])
     int local_nx = base_rows + (rank < remainder ? 1 : 0);
 
     // Allocate grid with 2 extra rows for ghost rows
-    double *grid = (double *)calloc((local_nx * 2) * ny, sizeof(double));
-    double *new_grid = (double *)calloc((local_nx * 2) * ny, sizeof(double));
+    double *grid = (double *)calloc((local_nx + 2) * ny, sizeof(double));
+    double *new_grid = (double *)calloc((local_nx + 2) * ny, sizeof(double));
 
     initialize_grid(grid, nx, ny, rank, size, local_nx);
     solve_heat_equation(grid, new_grid, steps, r, ny, local_nx, rank, size);
