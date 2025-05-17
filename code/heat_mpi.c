@@ -68,7 +68,7 @@ void solve_heat_equation(double *grid, double *new_grid, int steps, double r, in
                          MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
-#pragma omp parallel for private(i, j) collapse(2)
+#pragma omp parallel for private(i, j, idx) collapse(2)
         for (i = 1; i <= local_nx; i++)
         {
             for (j = 1; j < ny - 1; j++)
@@ -80,7 +80,6 @@ void solve_heat_equation(double *grid, double *new_grid, int steps, double r, in
             }
         }
 
-        // Set Dirichlet boundaries on top and bottom rows
         if (is_first)
         {
             #pragma omp parallel for
@@ -97,7 +96,7 @@ void solve_heat_equation(double *grid, double *new_grid, int steps, double r, in
                 new_grid[local_nx * ny + j] = 0.0;  // Last interior row, boundary below
             }
         }
-
+        
         temp = grid;
         grid = new_grid;
         new_grid = temp;
