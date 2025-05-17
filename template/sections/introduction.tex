@@ -4,6 +4,11 @@
 
 \section{Introduction}
 
-Lorem ipsum...
+The purpose of this assignment is to make a hybrid implementation of the \textit{Heat Diffusion} using \acrfull{omp} and \acrfull{mpi}\cite{BibEntry2025May} from the previous \acrshort{omp} implementation.
+
+With the nature of these APIs, the program will be able to use the full capacity of the Moore cluster, doing so by delegating the execution in each node to \acrshort{omp} and the distribution of the work and communications to \acrshort{mpi}.
+As we already had the \acrshort{omp} implementation from last submission, we will comment only the changes that we did to integrate \acrshort{mpi}'s communications.
+
+First of all, as mentioned in the handed \acrshort{pdf}, we decided to implement a \textbf{static mapping of tasks} that divides the virtual grid into rows and each node in \acrshort{mpi} calculates one and communicates with its neighbors.
 
 \end{document}

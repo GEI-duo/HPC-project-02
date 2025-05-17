@@ -1,0 +1,42 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\section{Code implementation}
+
+In this section we will comment the most important changes in the code that we made to make the \acrshort{omp}+\acrshort{mpi} hybrid implementation, we will start function by function after commenting the \acrshort{mpi} initialization comment.
+
+\subsection{Initialization}
+
+First, we will comment how the \acrshort{mpi} has been initialized in the main function as in \textit{Code \ref{code:mpi-init}}.
+This process involves the creation of two local variables to store the results of the initialization \textit{rank} and \textit{size}, respectively representing a unique identifier and the number of processes, which later will be used for the work split.
+
+Then, we divide the number of rows in the grid by the number of processes, and gather the remaining ones (if any), having as result the `total amount of work' that this process has to do in the \textit{local\_nx} variable, which represents the number of rows that the process has to do.
+
+Lastly, we changed the initialization of the grids by adding two extra `ghost' rows for the communication between processes, this is reflected in the memory allocation call, which has been updated to make use of the `total amount of work' of the process instead of the full grid and adding these two extra rows.
+
+\subsubsection{Function: \textit{initialize\_grid}}
+
+Once \acrshort{mpi} and everything is initialized, we have to do the `starter' diagonal heat, to candle the light of the program, and be able to make the calculations. We don't expect much improvement in the overall execution time of the program by the optimization of this function since its only ran once, so we will go over it quickly.
+As you can see in the \textit{Code \ref{code:heat-init}}, we are now using the \textit{rank} and \textit{size} variables to know the offset that the process has to calculate and the \textit{local\_nx} to know how many rows each process has to compute, this will settle an example for how we will use it for the heat calculation. The rest of the function remains practically unchanged.
+
+\subsection{Heat calculations}
+
+Here comes the big deal. As we can see in \textit{Code \ref{code:heat-calculation}}, for every iteration every processes has to communicate to its neighbours the results that they may need to use in their calculations and to receive the same from them, this means, communicating these `ghost' rows that are adjacent, having in mind the out-of-bounds. 
+Once the processes have communicated, the formula is applied the same way as in the last assignment, just that the application of the Dirichlet boundaries is only done in the top and last row of the grid.
+
+
+\subsection{Gathering and finalization}
+
+Once the calculations are done, we communicate back the resulting heat grid as in \textit{Code \ref{code:mpi-gathering}}, allocating a new grid with the full size and putting there the results of the calculations of the different processes.
+
+\subsubsection{Function: \textit{print\_grid}}
+
+Completely deleted. There was no need and it was slowing down the execution.
+
+\subsubsection{Function: \textit{write\_grid}}
+
+This function remained the same way since only one process had to do the parallelization using \acrshort{omp}, as commented in last assignment.
+
+
+\end{document}

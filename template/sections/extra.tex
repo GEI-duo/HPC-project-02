@@ -1,0 +1,21 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\section{Extra? work}
+
+Just as in last submission, we kept the extra work we did and now we are just going to make an overview in the following \textit{Code \ref{makefile}}.
+
+\begin{code}{title=Some examples of Makefile commands,label=makefile}{bash}
+    $ make all      # Compiles the different C files and runs the MPI program
+    $ make test     # Compares the '.bmp' files in the results directory
+    $ make time     # Extracts the execution times from the log in the output files
+    $ make clean    # Removes all resulting files
+    #... There are some others but they are irrelevant for the purpose of this assignment
+\end{code}
+
+\subsection{Testing}
+As we talked about in the last assignment, we did some automatic testing that compared the resulting BMP files of the serial version with the rest (depending on size and iterations, obviously).
+In the last submit, it was not that needed since the solution was just adding a few lines of code, but in this one, which was harder, really shined since we had to do some iterations and it was easier to track some errors.
+
+\end{document}

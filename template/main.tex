@@ -26,12 +26,12 @@
 
 % Table of Contents
 \tableofcontents
-\clearpage
+% \clearpage
 
 % List of *
-% \tcblistof[\section*]{code}{\codListTitle}                    % codes
+\tcblistof[\section*]{code}{\codListTitle}                    % codes
 % \tcblistof[\section*]{theorem}{\theoListTitle}                % theorems
-% \renewcommand{\listfigurename}{\figListTitle}\listoffigures   % figures
+\renewcommand{\listfigurename}{\figListTitle}\listoffigures   % figures
 \renewcommand\listtablename{\tabListTitle}\listoftables       % tables
 }
 
@@ -41,12 +41,13 @@
 % ------------------------- CONTENT ------------------------- %
 
 \subfile{sections/introduction}
-\clearpage
-\subfile{examples/examples}
-\clearpage
+\subfile{sections/code}
+\subfile{sections/results}
+\subfile{sections/extra}
 
 % ---------------------------------------------------------- %
 
+\clearpage
 % Acronyms
 \printglossary[type=\acronymtype, title=\acrTitle]
 
@@ -55,9 +56,9 @@
 
 % Bibliography
 \printbibliography[heading=bibintoc, title=\bibTitle]
-\clearpage
+
 
 % Appendix
-% \subfile{appendix}
+\subfile{appendix}
 
 \end{document}
