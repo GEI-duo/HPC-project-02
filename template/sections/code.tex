@@ -9,7 +9,7 @@ In this section we will comment the most important changes in the code that we m
 \subsection{Initialization}
 
 First, we will comment how the \acrshort{mpi} has been initialized in the main function as in \textit{Code \ref{code:mpi-init}}.
-This process involves the creation of two local variables to store the results of the initialization \textit{rank} and \textit{size}, respectively representing a unique identifier and the number of processes, which later will be used for the work split.
+This process involves the creation of two local variables to store the results of the initialization \textit{rank} and \textit{size}, representing a unique identifier and the number of processes respectively, which later will be used for the work split.
 
 Then, we divide the number of rows in the grid by the number of processes, and gather the remaining ones (if any), having as result the `total amount of work' that this process has to do in the \textit{local\_nx} variable, which represents the number of rows that the process has to do.
 

@@ -1,0 +1,20 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\section{Conclusions}
+
+First of all we will discuss about imbalance, since its one of the assignment points. We split the work in a way that every node has \textit{N} or \textit{N+1} number of rows which, in our opinion is decent, although some rows may contain more workload than others and lead to imbalance either way.
+To quantify that, we could gather information of the runtime of every node and gather it at the end, but we did not implement that. Either way, we can think there is imbalance since the nodes have to communicate every iteration, they must wait for each other. Because execution time remains nearly constant when using more than 4 workers, we can infer that the bottleneck is not computation but synchronization, nodes are likely waiting for others to complete before proceeding.
+
+
+There is a weird pattern in speedup, worsening at 4 nodes but improving in the rest of workers number, although that we can see that it's due to the rapid decrease in size (100x100).
+In the other hand, we can see a rapid improvement in size (1000x1000) that steadies around \textit{1.3}, while in larger sizes is slower and steadies around \textit{1.6}.
+
+
+From these results, we can already see that the scalability is not that great, at least not with our implementation, we can further see that with the following conclusions.
+
+Efficiency drops rapidly as we increase the number of MPI ranks, it's likely that each node is not doing enough computation to justify the communication overhead. This is typical when the problem size is too small relative to the number of workers.
+We can confirm this by looking at the overhead percentage, which approaches 100\% as the number of workers increases
+
+\end{document}
