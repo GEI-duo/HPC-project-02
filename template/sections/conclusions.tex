@@ -17,4 +17,7 @@ From these results, we can already see that the scalability is not that great, a
 Efficiency drops rapidly as we increase the number of MPI ranks, it's likely that each node is not doing enough computation to justify the communication overhead. This is typical when the problem size is too small relative to the number of workers.
 We can confirm this by looking at the overhead percentage, which approaches 100\% as the number of workers increases
 
+
+In conclusion, we see that the resources are not used well and its more pronounced when the problem size is smaller.
+
 \end{document}
